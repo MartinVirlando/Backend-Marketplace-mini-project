@@ -1,0 +1,27 @@
+package utils
+
+import (
+	"github.com/labstack/echo/v4"
+)
+
+type Response struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
+}
+
+func SuccessResponse(c echo.Context, statusCode int, message string, data any) error {
+	return c.JSON(statusCode, Response{
+		Success: true,
+		Message: message,
+		Data:    data,
+	})
+}
+
+func ErrorResponse(c echo.Context, statusCode int, message string) error {
+	return c.JSON(statusCode, Response{
+		Success: false,
+		Message: message,
+		Data:    nil,
+	})
+}
