@@ -32,7 +32,7 @@ func (s *CartService) AddItem(userID uint, productID uint, quantity int) (*model
 	if err != nil {
 		return nil, err
 	}
-	return cart, nil
+	return s.repo.FindByID(cart.ID)
 }
 
 func (s *CartService) GetCart(userID uint) ([]models.CartItem, error) {

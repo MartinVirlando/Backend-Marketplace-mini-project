@@ -31,8 +31,7 @@ func (s *MessageService) SendMessage(senderID uint, receiverID uint, productID *
 	if err != nil {
 		return nil, err
 	}
-	return msg, nil
-
+	return s.repo.FindByID(msg.ID)
 }
 
 func (s *MessageService) GetConversations(userID uint) ([]models.Message, error) {

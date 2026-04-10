@@ -6,9 +6,9 @@ import (
 )
 
 type DashboardStats struct {
-	TotalTransactions int
-	TotalUsers        int
-	TotalProducts     int
+	TotalTransactions int `json:"total_transactions"`
+	TotalUsers        int `json:"total_users"`
+	TotalProducts     int `json:"total_products"`
 }
 
 type AdminServiceInterface interface {

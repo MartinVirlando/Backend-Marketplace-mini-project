@@ -39,7 +39,7 @@ func (r *ProductRepository) FindByID(id uint) (*models.Product, error) {
 
 func (r *ProductRepository) FindAll(search string, categoryId uint, page int, limit int) ([]models.Product, error) {
 	var products []models.Product
-	query := r.db.Preload("Category").Offset((page - 1) * limit).Limit(limit)
+	query := r.db.Preload("Seller").Preload("Category").Offset((page - 1) * limit).Limit(limit)
 
 	if search != "" {
 		query = query.Where("name LIKE ?", "%"+search+"%")
@@ -59,7 +59,7 @@ func (r *ProductRepository) FindAll(search string, categoryId uint, page int, li
 
 func (r *ProductRepository) FindBySeller(sellerID uint) ([]models.Product, error) {
 	var products []models.Product
-	err := r.db.Where("seller_id = ?", sellerID).Find(&products).Error
+	err := r.db.Preload("Seller").Preload("Category").Where("seller_id = ?", sellerID).Find(&products).Error
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (r *ProductRepository) FindBySeller(sellerID uint) ([]models.Product, error
 
 func (r *ProductRepository) FindPending() ([]models.Product, error) {
 	var products []models.Product
-	err := r.db.Where("status = ?", "pending").Find(&products).Error
+	err := r.db.Preload("Seller").Preload("Category").Where("status = ?", "pending").Find(&products).Error
 	if err != nil {
 		return nil, err
 	}

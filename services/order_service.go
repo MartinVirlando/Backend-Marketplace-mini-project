@@ -43,6 +43,14 @@ func (s *OrderService) CreateOrder(userID uint, cartItems []models.CartItem, shi
 		return nil, err
 	}
 
+	for i := range cartItems {
+		cartItems[i].OrderID = &order.ID
+		err = s.repo.UpdateCartItem(&cartItems[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return order, nil
 }
 

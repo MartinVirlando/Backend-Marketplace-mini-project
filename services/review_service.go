@@ -31,7 +31,7 @@ func (s *ReviewService) CreateReview(userID uint, productID uint, rating int, co
 	if err != nil {
 		return nil, err
 	}
-	return review, nil
+	return s.repo.FindByID(review.ID)
 }
 
 func (s *ReviewService) GetReviews(productID uint) ([]models.Review, error) {

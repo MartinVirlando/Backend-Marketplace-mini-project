@@ -29,7 +29,7 @@ func (r *CartRepository) AddItem(cart *models.CartItem) error {
 
 func (r *CartRepository) FindByUserID(userID uint) ([]models.CartItem, error) {
 	var carts []models.CartItem
-	err := r.db.Preload("Product").Where("user_id = ?", userID).Find(&carts).Error
+	err := r.db.Preload("User").Preload("Product").Preload("Product.Seller").Preload("Product.Category").Where("user_id = ?", userID).Find(&carts).Error
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (r *CartRepository) FindByUserID(userID uint) ([]models.CartItem, error) {
 
 func (r *CartRepository) FindByID(id uint) (*models.CartItem, error) {
 	var cart models.CartItem
-	err := r.db.First(&cart, id).Error
+	err := r.db.Preload("User").Preload("Product").Preload("Product.Seller").Preload("Product.Category").First(&cart, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -54,5 +54,5 @@ func (r *CartRepository) Delete(id uint) error {
 }
 
 func (r *CartRepository) ClearByUserID(userID uint) error {
-	return r.db.Where("user_id = ?", userID).Delete(&models.CartItem{}).Error
+	return r.db.Where("user_id = ? AND order_id IS NULL", userID).Delete(&models.CartItem{}).Error
 }

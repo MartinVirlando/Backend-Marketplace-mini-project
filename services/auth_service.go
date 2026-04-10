@@ -12,7 +12,7 @@ import (
 
 type AuthServiceInterface interface {
 	Register(name, email, password, phone, role string) (*models.User, error)
-	Login(email, password string) (string, error)
+	Login(email, password string) (string, *models.User, error)
 	GetMe(id uint) (*models.User, error)
 	UpdateProfile(id uint, name, phone string) (*models.User, error)
 }
@@ -50,27 +50,27 @@ func (s *AuthService) Register(name, email, password, phone, role string) (*mode
 	return user, nil
 }
 
-func (s *AuthService) Login(email, password string) (string, error) {
+func (s *AuthService) Login(email, password string) (string, *models.User, error) {
 	//Cari User berdasarkan Email
 	user, err := s.repo.FindByEmail(email)
 	if err != nil {
-		return "", err
+		return "", user, err
 	}
 
 	//Cek Password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return "", errors.New("invalid password")
+		return "", user, errors.New("invalid password")
 	}
 
 	//Generate Token
 	token, err := utils.GenerateToken(fmt.Sprintf("%d", user.ID), user.Role)
 	if err != nil {
-		return "", err
+		return "", user, err
 	}
 
 	//Return Token
-	return token, nil
+	return token, user, nil
 }
 
 func (s *AuthService) GetMe(id uint) (*models.User, error) {

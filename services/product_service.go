@@ -22,6 +22,7 @@ type ProductServiceInterface interface {
 	Update(id uint, sellerID uint, req ProductRequest) (*models.Product, error)
 	Delete(id uint, sellerID uint) error
 	GetBySeller(sellerID uint) ([]models.Product, error)
+	UpdateStatus(id uint, sellerID uint, status string) (*models.Product, error)
 }
 
 type ProductService struct {
@@ -51,7 +52,7 @@ func (s *ProductService) Create(sellerID uint, req ProductRequest) (*models.Prod
 		return nil, err
 	}
 
-	return product, nil
+	return s.repo.FindByID(product.ID)
 }
 
 func (s *ProductService) GetAll(search string, categoryID uint, page int, limit int) ([]models.Product, error) {
@@ -122,4 +123,23 @@ func (s *ProductService) GetBySeller(sellerID uint) ([]models.Product, error) {
 		return nil, err
 	}
 	return products, nil
+}
+
+func (s *ProductService) UpdateStatus(id uint, sellerID uint, status string) (*models.Product, error) {
+	product, err := s.repo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if product.SellerID != sellerID {
+		return nil, errors.New("you are not allowed to update this product")
+	}
+
+	product.Status = status
+	err = s.repo.Update(product)
+	if err != nil {
+		return nil, err
+	}
+
+	return product, nil
 }

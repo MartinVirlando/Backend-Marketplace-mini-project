@@ -27,7 +27,7 @@ func (r *ReviewRepository) Create(review *models.Review) error {
 
 func (r *ReviewRepository) FindByProductID(productID uint) ([]models.Review, error) {
 	var reviews []models.Review
-	err := r.db.Preload("User").Where("product_id = ?", productID).Find(&reviews).Error
+	err := r.db.Preload("User").Preload("Product").Preload("Product.Seller").Preload("Product.Category").Where("product_id = ?", productID).Find(&reviews).Error
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (r *ReviewRepository) FindByProductID(productID uint) ([]models.Review, err
 
 func (r *ReviewRepository) FindByID(id uint) (*models.Review, error) {
 	var review models.Review
-	err := r.db.First(&review, id).Error
+	err := r.db.Preload("User").Preload("Product").Preload("Product.Seller").Preload("Product.Category").First(&review, id).Error
 	if err != nil {
 		return nil, err
 	}
