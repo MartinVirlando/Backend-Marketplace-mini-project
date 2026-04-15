@@ -11,6 +11,7 @@ type ReviewRepositoryInterface interface {
 	FindByProductID(productID uint) ([]models.Review, error)
 	FindByID(id uint) (*models.Review, error)
 	Delete(id uint) error
+	FindByUserAndProduct(userID uint, productID uint) (*models.Review, error)
 }
 
 type ReviewRepository struct {
@@ -45,4 +46,13 @@ func (r *ReviewRepository) FindByID(id uint) (*models.Review, error) {
 
 func (r *ReviewRepository) Delete(id uint) error {
 	return r.db.Delete(&models.Review{}, id).Error
+}
+
+func (r *ReviewRepository) FindByUserAndProduct(userID uint, productID uint) (*models.Review, error) {
+	var review models.Review
+	err := r.db.Where("user_id = ? AND product_id = ?", userID, productID).First(&review).Error
+	if err != nil {
+		return nil, err
+	}
+	return &review, nil
 }

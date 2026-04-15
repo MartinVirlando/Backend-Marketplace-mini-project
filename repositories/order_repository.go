@@ -13,6 +13,7 @@ type OrderRepositoryInterface interface {
 	Update(order *models.Order) error
 	GetAll() ([]models.Order, error)
 	UpdateCartItem(cartItem *models.CartItem) error
+	HasPurchased(userID uint, productID uint) (bool, error)
 }
 
 type OrderRepository struct {
@@ -102,4 +103,14 @@ func (r *OrderRepository) Update(order *models.Order) error {
 
 func (r *OrderRepository) UpdateCartItem(cartItem *models.CartItem) error {
 	return r.db.Save(cartItem).Error
+}
+
+func (r *OrderRepository) HasPurchased(userID uint, productID uint) (bool, error) {
+	var count int64
+	err := r.db.Table("cart_items").
+		Joins("JOIN orders ON orders.id = cart_items.order_id").
+		Where("cart_items.user_id = ? AND cart_items.product_id = ? AND orders.status IN ?",
+			userID, productID, []string{"paid", "shipped"}).
+		Count(&count).Error
+	return count > 0, err
 }

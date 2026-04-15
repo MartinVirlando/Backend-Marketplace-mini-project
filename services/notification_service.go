@@ -10,6 +10,7 @@ type NotificationServiceInterface interface {
 	GetNotifications(userID uint) ([]models.Notification, error)
 	MarkAsRead(id uint) error
 	MarkAllAsRead(userID uint) error
+	DeleteNotification(id uint) error
 }
 
 type NotificationService struct {
@@ -56,4 +57,8 @@ func (s *NotificationService) MarkAllAsRead(userID uint) error {
 		return err
 	}
 	return nil
+}
+
+func (s *NotificationService) DeleteNotification(id uint) error {
+	return s.repo.Delete(id)
 }

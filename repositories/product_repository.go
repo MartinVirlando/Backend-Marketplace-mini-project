@@ -39,10 +39,10 @@ func (r *ProductRepository) FindByID(id uint) (*models.Product, error) {
 
 func (r *ProductRepository) FindAll(search string, categoryId uint, page int, limit int) ([]models.Product, error) {
 	var products []models.Product
-	query := r.db.Preload("Seller").Preload("Category").Offset((page - 1) * limit).Limit(limit)
+	query := r.db.Preload("Seller").Preload("Category").Offset((page-1)*limit).Limit(limit).Where("status = ?", "approved")
 
 	if search != "" {
-		query = query.Where("name LIKE ?", "%"+search+"%")
+		query = query.Where("name ILIKE ?", "%"+search+"%")
 	}
 
 	if categoryId != 0 {

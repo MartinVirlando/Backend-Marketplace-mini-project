@@ -61,3 +61,17 @@ func (ctrl *NotificationController) MarkAllAsRead(c echo.Context) error {
 
 	return utils.SuccessResponse(c, http.StatusOK, "All notifications marked as read", nil)
 }
+
+func (ctrl *NotificationController) Delete(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Invalid ID")
+	}
+
+	err = ctrl.service.DeleteNotification(uint(id))
+	if err != nil {
+		return utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return utils.SuccessResponse(c, http.StatusOK, "Notification deleted", nil)
+}

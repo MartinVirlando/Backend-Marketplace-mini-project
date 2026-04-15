@@ -3,6 +3,7 @@ package services
 import (
 	"backend/models"
 	"backend/repositories"
+	"log"
 )
 
 type MessageServiceInterface interface {
@@ -13,11 +14,12 @@ type MessageServiceInterface interface {
 }
 
 type MessageService struct {
-	repo repositories.MessageRepositoryInterface
+	repo      repositories.MessageRepositoryInterface
+	notifRepo repositories.NotificationRepositoryInterface
 }
 
-func NewMessageService(repo repositories.MessageRepositoryInterface) MessageServiceInterface {
-	return &MessageService{repo: repo}
+func NewMessageService(repo repositories.MessageRepositoryInterface, notifRepo repositories.NotificationRepositoryInterface) MessageServiceInterface {
+	return &MessageService{repo: repo, notifRepo: notifRepo}
 }
 
 func (s *MessageService) SendMessage(senderID uint, receiverID uint, productID *uint, message string) (*models.Message, error) {
@@ -27,10 +29,26 @@ func (s *MessageService) SendMessage(senderID uint, receiverID uint, productID *
 		ProductID:  productID,
 		Message:    message,
 	}
+
 	err := s.repo.Create(msg)
 	if err != nil {
 		return nil, err
 	}
+
+	existing, _ := s.notifRepo.FindUnreadChat(receiverID, senderID)
+	log.Printf("FindUnreadChat result: existing=%v, err=%v", existing, err)
+	if existing == nil {
+		notif := &models.Notification{
+			UserID:      receiverID,
+			Title:       "Pesan Baru",
+			Message:     "Kamu mendapat pesan baru",
+			Type:        "chat",
+			IsRead:      false,
+			ReferenceID: &senderID,
+		}
+		s.notifRepo.Create(notif)
+	}
+
 	return s.repo.FindByID(msg.ID)
 }
 

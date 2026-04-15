@@ -6,12 +6,14 @@ import (
 	"gorm.io/gorm"
 )
 
-type NotificationRepositoryInterface interface{
+type NotificationRepositoryInterface interface {
 	Create(notification *models.Notification) error
 	FindByUserID(userID uint) ([]models.Notification, error)
 	MarkAsRead(id uint) error
 	MarkAllAsRead(userID uint) error
-} 
+	FindUnreadChat(userID uint, senderID uint) (*models.Notification, error)
+	Delete(id uint) error
+}
 
 type NotificationRepository struct {
 	db *gorm.DB
@@ -40,4 +42,17 @@ func (r *NotificationRepository) MarkAsRead(id uint) error {
 
 func (r *NotificationRepository) MarkAllAsRead(userID uint) error {
 	return r.db.Model(&models.Notification{}).Where("user_id = ?", userID).Update("is_read", true).Error
+}
+
+func (r *NotificationRepository) FindUnreadChat(userID uint, senderID uint) (*models.Notification, error) {
+	var notif models.Notification
+	err := r.db.Where("user_id = ? AND reference_id = ? AND type = ? AND is_read = ?", userID, senderID, "chat", false).First(&notif).Error
+	if err != nil {
+		return nil, err
+	}
+	return &notif, nil
+}
+
+func (r *NotificationRepository) Delete(id uint) error {
+	return r.db.Delete(&models.Notification{}, id).Error
 }

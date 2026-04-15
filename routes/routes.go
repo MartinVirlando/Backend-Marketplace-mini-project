@@ -60,6 +60,7 @@ func SetupRoute(e *echo.Echo,
 	protected.GET("/notifications", notificationCtrl.GetNotifications)
 	protected.PUT("/notifications/:id/read", notificationCtrl.MarkAsRead)
 	protected.PUT("/notifications/read-all", notificationCtrl.MarkAllAsRead)
+	protected.DELETE("/notifications/:id", notificationCtrl.Delete)
 
 	//Seller Only
 	seller := api.Group("")
