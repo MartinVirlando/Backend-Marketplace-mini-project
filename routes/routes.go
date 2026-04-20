@@ -17,7 +17,9 @@ func SetupRoute(e *echo.Echo,
 	messageCtrl *controllers.MessageController,
 	notificationCtrl *controllers.NotificationController,
 	adminCtrl *controllers.AdminController,
+	uploadCtrl *controllers.UploadController,
 ) {
+	e.Static("/uploads", "uploads")
 	api := e.Group("/api")
 	auth := api.Group("/auth")
 
@@ -61,6 +63,9 @@ func SetupRoute(e *echo.Echo,
 	protected.PUT("/notifications/:id/read", notificationCtrl.MarkAsRead)
 	protected.PUT("/notifications/read-all", notificationCtrl.MarkAllAsRead)
 	protected.DELETE("/notifications/:id", notificationCtrl.Delete)
+
+	protected.POST("/upload", uploadCtrl.UploadImage)
+
 
 	//Seller Only
 	seller := api.Group("")

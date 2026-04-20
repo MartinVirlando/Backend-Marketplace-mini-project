@@ -24,8 +24,9 @@ type LoginRequest struct {
 }
 
 type UpdateProfileRequest struct {
-	Name  string `json:"name"`
-	Phone string `json:"phone"`
+	Name   string `json:"name"`
+	Phone  string `json:"phone"`
+	Avatar string `json:"avatar"`
 }
 
 type AuthController struct {
@@ -115,7 +116,7 @@ func (controller *AuthController) UpdateProfile(c echo.Context) error {
 	userID := uint(userIDUint64)
 
 	//Service Update Profile
-	updatedUser, err := controller.service.UpdateProfile(userID, req.Name, req.Phone)
+	updatedUser, err := controller.service.UpdateProfile(userID, req.Name, req.Phone, req.Avatar)
 	if err != nil {
 		return utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to update profile")
 	}

@@ -14,7 +14,7 @@ type AuthServiceInterface interface {
 	Register(name, email, password, phone, role string) (*models.User, error)
 	Login(email, password string) (string, *models.User, error)
 	GetMe(id uint) (*models.User, error)
-	UpdateProfile(id uint, name, phone string) (*models.User, error)
+	UpdateProfile(id uint, name, phone string, avatar string) (*models.User, error)
 }
 
 type AuthService struct {
@@ -81,20 +81,21 @@ func (s *AuthService) GetMe(id uint) (*models.User, error) {
 	return user, nil
 }
 
-func (s *AuthService) UpdateProfile(id uint, name, phone string) (*models.User, error) {
-	//Cari User berdasarkan ID
+func (s *AuthService) UpdateProfile(id uint, name, phone, avatar string) (*models.User, error) {
 	user, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	//Update
 	user.Name = name
 	user.Phone = phone
+	if avatar != "" {
+		user.Avatar = avatar
+	}
+
 	err = s.repo.Update(user)
 	if err != nil {
 		return nil, err
 	}
-
 	return user, nil
 }

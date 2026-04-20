@@ -59,6 +59,8 @@ func main() {
 	messageCtrl := controllers.NewMessageController(messageService)
 	notificationCtrl := controllers.NewNotificationController(notificationService)
 	adminCtrl := controllers.NewAdminController(adminService)
+	uploadCtrl := controllers.NewUploadController()
+
 
 	//Setup Echo
 	e := echo.New()
@@ -83,6 +85,7 @@ func main() {
 		messageCtrl,
 		notificationCtrl,
 		adminCtrl,
+		uploadCtrl,
 	)
 
 	//Start Server

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"backend/models"
 	"backend/services"
 	"backend/utils"
 
@@ -19,6 +20,7 @@ type OrderRequest struct {
 }
 
 type OrderItemRequest struct {
+	ID        uint `json:"id"`
 	ProductID uint `json:"product_id"`
 	Quantity  int  `json:"quantity"`
 }
@@ -78,13 +80,26 @@ func (ctrl *OrderController) CreateOrder(c echo.Context) error {
 	}
 
 	// Ambil cart items user
-	cartItems, err := ctrl.cartService.GetCart(userID)
+	allCartItems, err := ctrl.cartService.GetCart(userID)
 	if err != nil {
 		return utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 
+	// Filter hanya item yang dikirim FE
+	itemIDSet := map[uint]bool{}
+	for _, item := range req.Items {
+		itemIDSet[item.ID] = true
+	}
+
+	var cartItems []models.CartItem
+	for _, item := range allCartItems {
+		if itemIDSet[item.ID] {
+			cartItems = append(cartItems, item)
+		}
+	}
+
 	if len(cartItems) == 0 {
-		return utils.ErrorResponse(c, http.StatusBadRequest, "Cart is empty")
+		return utils.ErrorResponse(c, http.StatusBadRequest, "No valid items selected")
 	}
 
 	// Buat order dari cart items
